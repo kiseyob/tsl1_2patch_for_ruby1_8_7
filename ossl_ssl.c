@@ -230,6 +230,19 @@ ossl_call_client_cert_cb(VALUE obj)
     return Qtrue;
 }
 
+static VALUE
+ossl_ssl_get_version(VALUE self)
+{
+    SSL *ssl;
+
+    Data_Get_Struct(self, SSL, ssl);
+    if (!ssl) {
+        rb_warning("SSL session is not started yet.");
+        return Qnil;
+    }
+    return rb_str_new2(SSL_get_version(ssl));
+}
+
 static int
 ossl_client_cert_cb(SSL *ssl, X509 **x509, EVP_PKEY **pkey)
 {
@@ -1443,6 +1456,7 @@ Init_ossl_ssl()
     rb_define_method(cSSLSocket, "cert",       ossl_ssl_get_cert, 0);
     rb_define_method(cSSLSocket, "peer_cert",  ossl_ssl_get_peer_cert, 0);
     rb_define_method(cSSLSocket, "peer_cert_chain", ossl_ssl_get_peer_cert_chain, 0);
+    rb_define_method(cSSLSocket, "ssl_version",    ossl_ssl_get_version, 0);
     rb_define_method(cSSLSocket, "cipher",     ossl_ssl_get_cipher, 0);
     rb_define_method(cSSLSocket, "state",      ossl_ssl_get_state, 0);
     rb_define_method(cSSLSocket, "pending",    ossl_ssl_pending, 0);
